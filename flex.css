@@ -1,0 +1,55 @@
+body {
+    font-size: 2em;
+}
+
+#gameboard {
+    background-color: whitesmoke;
+    width: fit-content;
+}
+
+#gameboard :nth-child(4n) > [class^=col] {
+    background-color: #F578A2;
+}
+
+#gameboard :nth-child(4n + 1) > [class^=col] {
+    background-color: #9DF5A6;
+}
+
+#gameboard :nth-child(4n + 2) > [class^=col] {
+    background-color: #6B8DF5;
+}
+#gameboard :nth-child(4n + 3) > [class^=col] {
+    background-color: #F5D684;
+}
+
+[class^=row] {
+    display: flex;
+    flex-direction: row;
+    width: fit-content;
+}
+
+[class^=row] .card {
+    width: 1em;
+    height: 1em;
+    display: flex;
+    margin: 10px;
+    padding: 20px;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid transparent; /* Spaceholder so hover doesnt ruin layout */ 
+    border-radius: 8px;
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16),
+                0 2px 10px 0 rgba(0,0,0,0.12);
+    
+}
+
+.card:hover {
+    cursor: pointer;
+    border: 2px solid lightblue;
+    box-shadow: 0 2px 5px 0 rgba(110,230,245,0.60),
+                0 2px 10px 0 rgba(110,230,245,0.18);
+}
+
+.hidden {
+    visibility: hidden;
+}
