@@ -4,7 +4,7 @@ function map(n, start1, stop1, start2, stop2) {
 };
 
 let cols = 3;
-let rows = 2;
+let rows = 3;
 let totalCards = rows * cols;
 let gameboard = document.querySelector('#gameboard');
 let players = 2;
@@ -57,7 +57,7 @@ function checkGameOver() {
     else return false;
 }
 
-function handleClick(card) { // TODO consider gameOver
+function handleClick(card) {
     if (firstTry) {
         flipCard(card);
         firstCard = card;
@@ -144,7 +144,7 @@ for (let r = 0; r < rows; r++) {
         cellClass.value = 'col-' + (c+1) + ' ' + 'card';
         newCell.setAttributeNode(cellClass);
         cellClass = document.createAttribute('onClick');
-        cellClass.value = 'handleClick(this)'; // TODO call game clickHandler
+        cellClass.value = 'handleClick(this)';
         newCell.setAttributeNode(cellClass);
 
         let content = document.createTextNode('');
