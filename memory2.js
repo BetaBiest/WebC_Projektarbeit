@@ -28,7 +28,7 @@ Game.Memory = function (cols, rows, players = 2) {
    * @param {number} [rows] Number of Rows
    * @returns {Gameboard}
    */
-  var Gameboard = function (cols, rows) {
+  var Gameboard = function (cols, rows, gameboard) {
     /**
      * Card
      * @constructor
@@ -59,6 +59,7 @@ Game.Memory = function (cols, rows, players = 2) {
     this.rows = new Array(rows);
     for (let i = 0; i < rows; i++) {
       this.rows[i] = this.createRow(Number(i));
+      gameboard.appendChild(this.rows[i]);
     }
 
     this.board = new Array(cols);
@@ -79,14 +80,12 @@ Game.Memory = function (cols, rows, players = 2) {
       let rowClass = document.createAttribute("class");
       rowClass.value = "row-" + (n + 1);
       newRow.setAttributeNode(rowClass);
-
-      this.gameboard.appendChild(newRow); // TODO rethink gameboard...
       return newRow;
     },
 
   };
 
-  this._gameboard = new Gameboard(cols, rows);
+  this._gameboard = new Gameboard(this.cols, this.rows, this.gameboard);
 };
 
 Game.Memory.prototype = {
