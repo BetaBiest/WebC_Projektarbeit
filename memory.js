@@ -1,38 +1,46 @@
+// FIXME nothing works here ^^
+
 class Game_Memory {
-  constructor(c, r) {
+  static count = 0;
+  static gameboard;
+  static gameinformation;
+  static players;
+  static player_turn = 0;
+  static points;
+  static fistCard;
+  static secondTry = false;
+  static gameOver = false;
+
+  constructor(c = 0, r = 0, players = 2) {
     this.gameboard = document.querySelector("#gameboard");
-    this.players = 2;
-    this.player_turn = 0;
+    this.players = players;
     this.points = new Array(this.players);
-    this.secondTry = false;
-    this.gameOver = false;
     this.cols = c;
     this.rows = r;
+    this.totalCards = r * c;
+    this.gameinformation = this.createGame(c, r);
   }
 
-  handleClick(card) {
-    // TODO consider gameOver
-    if (!firstTry) {
-      this.firstCard = card;
-      firstTry = true;
-    } else {
-      if (this.firstCard.innerText == card.innerText) {
-        // Player found 2 matching cards
-        this.points[this.player_turn] += 1;
-        // TODO setTimeout for hiding
-        hide(this.firstCard);
-        hide(card);
-        if (this.checkGameOver()) this.gameOver = true;
-      } else {
-        this.firstCard.innerText = "";
-        card.innerText = "";
-      }
-      this.player_turn++;
-      if (this.player_turn == this.players) this.player_turn = 0;
+  static flipCard(card) {
+    if (card.innerText == '') {
+      let pos;
+      let row = card.parentElement.className;
+      pos = row.search('row-');
+      row = Number(row.slice(pos + 4, pos + 5));
+      let col = card.className;
+      pos = col.search('col-');
+      col = Number(col.slice(pos + 4, pos + 5));
+
+      card.innerText = String.fromCodePoint(this.gameinformation[col - 1][row - 1]);
     }
+    else card.innerText = '';
   }
 
-  checkGameOver() {
+  static hide(card) {
+    card.className += ' ' + 'hidden';
+  }
+
+  static checkGameOver() {
     let collectedPoints = 0;
     // Count the collected points
     for (let i in this.points) {
@@ -48,9 +56,85 @@ class Game_Memory {
     else return false;
   }
 
-  countTotalCards() {
+  // TODO Check for necessity
+  static countTotalCards() {
     this.totalCards = document.querySelectorAll(".card").length;
     return this.totalCards;
+  }
+
+  createGame(cols, rows) {
+    // Create storage for game information
+    let arr = new Array(cols);
+    for (let i = 0; i < cols; i++) {
+        arr[i] = new Array(rows);
+    }
+
+    // Determine needed Symbols and create then
+    let totalSymbols;
+    if (this.totalCards % 2) totalSymbols = this.totalCards / 2 + .5;
+    else totalSymbols = this.totalCards / 2;
+    let symbols = new Array(totalSymbols);
+    for (let i = 0; i < totalSymbols; i++) {
+        symbols[i] = 0x1F600 + i;
+    }
+
+    // Fill Array randomly with 2 of every symbol
+    for (let i = 0; i < totalSymbols * 2; i++) {
+        let buffer = symbols[i % totalSymbols];
+
+        if (i == (totalSymbols * 2 - 1) && this.totalCards % 2) break; // Leave last symbol alone when num of cards is uneven
+        let random = Math.floor(this.map(Math.random(), 0, 1, 0, this.totalCards));
+        while (arr[(random % cols)][(Math.floor(random / cols))] != undefined) {
+            random++;
+            if (random == this.totalCards) random = 0;
+        }
+        arr[(random % cols)][(Math.floor(random / cols))] = buffer;
+    }
+
+    debugger;
+    return arr;
+  }
+
+  // Helperfunction
+  map(n, start1, stop1, start2, stop2) {
+    const newval = (n - start1) / (stop1 - start1) * (stop2 - start2) + start2;
+    return newval;
+  }
+
+
+  static handleClick(card) {
+    console.log(card);
+    if (this.secondTry) {
+        this.flipCard(card);
+        this.firstCard = card;
+        this.secondTry = false;
+    }
+    else {
+      if (!(this.firstCard == card)) {
+        this.flipCard(card);
+        // FIXME check actual sign not the inner Text
+        if (this.firstCard.innerText == card.innerText) { // Player found 2 matching cards
+            this.points[player_turn] += 1;
+            console.log('Score for Player' + this.player_turn);
+
+            sleep(800)
+                .then(() => { this.hide(this.firstCard) })
+                .then(() => { this.hide(card) })
+                ;
+            if (checkGameOver()) this.gameOver = true;
+
+        } else { // Player didn´t found a pair
+            this.player_turn++;
+            if (this.player_turn == this.players) this.player_turn = 0;
+
+            sleep(1000)    // FIXME use flipCard() instead
+                .then(() => { this.firstCard.innerText = '' })
+                .then(() => { card.innerText = '' })
+                ;
+        }
+        this.firstTry = true;
+      }
+    }
   }
 }
 
@@ -72,6 +156,7 @@ class Board extends Game_Memory {
       }
     }
   }
+
   createRow(n) {
     let newRow = document.createElement("div");
     let rowClass = document.createAttribute("class");
@@ -81,25 +166,6 @@ class Board extends Game_Memory {
     this.gameboard.appendChild(newRow);
     return newRow;
   }
-  /*     createCard(x, y) {
-        let card = document.createElement('div');
-
-        let cardClass = document.createAttribute('class');
-        cardClass.value = 'col-' + (x+1) + ' ' + 'card';
-        card.setAttributeNode(cardClass);
-        cardClass = document.createAttribute('onClick');
-        cardClass.value = 'console.log(this)'; // TODO call game clickHandler
-        card.setAttributeNode(cardClass);
-
-        let content = document.createTextNode((x+y));
-        card.appendChild(content);
-
-        debugger;
-
-        this.rows[y].appendChild(card);
-
-        return card;
-    } */
 }
 
 class Card extends Game_Memory {
@@ -112,10 +178,10 @@ class Card extends Game_Memory {
     cardClass.value = "col-" + (x + 1) + " " + "card";
     this.card.setAttributeNode(cardClass);
     cardClass = document.createAttribute("onClick");
-    cardClass.value = "this.handleClick(this)"; // TODO call game clickHandler
+    cardClass.value = "Game_Memory.handleClick(this)";
     this.card.setAttributeNode(cardClass);
 
-    let content = document.createTextNode(x + y);
+    let content = document.createTextNode('');
     this.card.appendChild(content);
   }
 }
