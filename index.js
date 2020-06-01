@@ -7,7 +7,7 @@ let cols = 3;
 let rows = 3;
 let totalCards = rows * cols;
 let gameboard = document.querySelector('#gameboard');
-let players = 2;
+let players = 2; // TODO Implement players as dictonary
 let player_turn = 0;
 let points = new Array(players);
 for (i = 0; i < points.length; i++) points[i] = 0;
@@ -15,24 +15,25 @@ let firstTry = true;
 let gameOver = false;
 
 // Create storage for game information
-let arr = new Array();
+let arr = new Array(cols);
 for (let i = 0; i < cols; i++) {
-    arr[i] = new Array();
+    arr[i] = new Array(rows);
 }
 
 // Determine needed Symbols and create then
 let totalSymbols;
-if (totalCards % 2) totalSymbols = totalCards/2 + .5;
-else totalSymbols = totalCards/2;
+if (totalCards % 2) totalSymbols = totalCards / 2 + .5;
+else totalSymbols = totalCards / 2;
 let symbols = new Array(totalSymbols);
 for (let i = 0; i < totalSymbols; i++) {
-    symbols[i] = 0x1F600+i;
+    symbols[i] = 0x1F600 + i;
 }
 
-for (let i = 0; i < totalSymbols*2; i++) { // Fill Array randomly with 2 of every symbol
-    let buffer = symbols[i%totalSymbols];
+// Fill Array randomly with 2 of every symbol
+for (let i = 0; i < totalSymbols * 2; i++) {
+    let buffer = symbols[i % totalSymbols];
 
-    if (i == (totalSymbols*2-1) && totalCards % 2) break; // Leave last symbol alone when num of cards is uneven
+    if (i == (totalSymbols * 2 - 1) && totalCards % 2) break; // Leave last symbol alone when num of cards is uneven
     let random = Math.floor(map(Math.random(), 0, 1, 0, totalCards));
     while (arr[(random % cols)][(Math.floor(random / cols))] != undefined) {
         random++;
@@ -72,9 +73,9 @@ function handleClick(card) {
                 console.log('Score for Player' + player_turn);
 
                 sleep(800)
-                    .then(() => {hide(firstCard)})
-                    .then(() => {hide(card)})
-                ;
+                    .then(() => { hide(firstCard) })
+                    .then(() => { hide(card) })
+                    ;
                 if (checkGameOver()) gameOver = true;
 
             } else { // Player didn´t found a pair
@@ -82,9 +83,9 @@ function handleClick(card) {
                 if (player_turn == players) player_turn = 0;
 
                 sleep(1000)
-                    .then(() => {firstCard.innerText = ''})
-                    .then(() => {card.innerText = ''})
-                ;
+                    .then(() => { firstCard.innerText = '' })
+                    .then(() => { card.innerText = '' })
+                    ;
             }
             firstTry = true;
         }
@@ -103,11 +104,11 @@ function flipCard(cell) {
         let pos;
         let row = cell.parentElement.className;
         pos = row.search('row-');
-        row = Number(row.slice(pos+4, pos+5));
+        row = Number(row.slice(pos + 4, pos + 5));
         let col = cell.className;
         pos = col.search('col-');
-        col = Number(col.slice(pos+4, pos+5));
-        cell.innerText = String.fromCodePoint(arr[col-1][row-1]);
+        col = Number(col.slice(pos + 4, pos + 5));
+        cell.innerText = String.fromCodePoint(arr[col - 1][row - 1]);
     }
     else cell.innerText = '';
 }
@@ -134,14 +135,14 @@ function sleep(ms) {
 for (let r = 0; r < rows; r++) {
     let newRow = document.createElement('div');
     let rowClass = document.createAttribute('class');
-    rowClass.value = 'row-' + (r+1);
+    rowClass.value = 'row-' + (r + 1);
     newRow.setAttributeNode(rowClass);
 
     for (let c = 0; c < cols; c++) {
         let newCell = document.createElement('div');
 
         let cellClass = document.createAttribute('class');
-        cellClass.value = 'col-' + (c+1) + ' ' + 'card';
+        cellClass.value = 'col-' + (c + 1) + ' ' + 'card';
         newCell.setAttributeNode(cellClass);
         cellClass = document.createAttribute('onClick');
         cellClass.value = 'handleClick(this)';
