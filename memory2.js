@@ -9,9 +9,10 @@ var Game = Game || {}; // namespace
  * @returns {Game.Memory}
  */
 Game.Memory = function (cols, rows, players = 2) {
-  this.players;
+  this.players = players;
   this.player_turn = 0;
-  this.points = new Array(players);
+  this.points = new Array(players).fill(0); // ES6 requiered
+  //for (i = 0; i < this.points.length; i++) this.points[i] = 0; // Alternative
   this.cols = cols;
   this.rows = rows;
   this.totalCards = cols * rows;
@@ -41,19 +42,13 @@ Game.Memory = function (cols, rows, players = 2) {
 
       this.card = document.createElement('div');
 
-      let cellClass = document.createAttribute('class');
-      cellClass.value = 'col-' + (c + 1) + ' ' + 'card';
-      this.card.setAttributeNode(cellClass);
-      cellClass = document.createAttribute('onClick');
-      cellClass.value = 'console.log(this)'; // TODO call Game.Memory.clickHandler()
-      this.card.setAttributeNode(cellClass);
-
-      this.content = document.createTextNode('');
-      this.card.appendChild(this.content);
+      this.card.setAttribute('class', 'col-' + (c + 1) + ' ' + 'card');
+      this.card.addEventListener('click', () => this.handleClick(this));
     };
 
     Card.prototype = {
       constructor: Card,
+      handleClick: (card) => this.handleClick(card),
     };
 
     this.rows = new Array(rows);
@@ -71,49 +66,132 @@ Game.Memory = function (cols, rows, players = 2) {
       }
     }
   };
-
   Gameboard.prototype = {
     constructor: Gameboard,
 
     createRow: function (n) {
-      let newRow = document.createElement("div");
-      let rowClass = document.createAttribute("class");
-      rowClass.value = "row-" + (n + 1);
-      newRow.setAttributeNode(rowClass);
+      let newRow = document.createElement('div');
+      newRow.setAttribute('class', 'row-' + (n + 1));
       return newRow;
     },
 
+    handleClick: (card) => this.handleClick(card),
   };
 
   this._gameboard = new Gameboard(this.cols, this.rows, this.gameboard);
+
+  // Create storage for game information
+  this.gameInformation = new Array(cols);
+  for (let i = 0; i < cols; i++) {
+    this.gameInformation[i] = new Array(rows);
+  }
+
+  // Determine needed Symbols and create then
+  let totalSymbols;
+  if (this.totalCards % 2) totalSymbols = this.totalCards / 2 + .5;
+  else totalSymbols = this.totalCards / 2;
+  let symbols = new Array(this.totalSymbols);
+  for (let i = 0; i < totalSymbols; i++) {
+    symbols[i] = 0x1F600 + i;
+  }
+
+  // Fill Array randomly with 2 of every symbol
+  for (let i = 0; i < totalSymbols * 2; i++) {
+  let buffer = symbols[i % totalSymbols];
+
+  if (i == (totalSymbols * 2 - 1) && this.totalCards % 2) break; // Leave last symbol alone when num of cards is uneven
+  let random = Math.floor(this.map(Math.random(), 0, 1, 0, this.totalCards));
+  while (this.gameInformation[(random % this.cols)][(Math.floor(random / this.cols))] != undefined) {
+    random++;
+    if (random == this.totalCards) random = 0;
+  }
+  this.gameInformation[(random % this.cols)][(Math.floor(random / this.cols))] = buffer;
+  }
 };
 
 Game.Memory.prototype = {
   constructor: Game.Memory,
-  /**
-   * handleClick
-   * @param {HTMLElement} card clicked Card
-   */
+
   handleClick: function (card) {
-    // TODO transfer from index.js
+    if (this.firstTry) {
+      this.flipCard(card);
+      this.firstCard = card;
+      this.firstTry = false;
+    }
+    else {
+      if (!(this.firstCard == card)) {
+        this.flipCard(card);
+        // FIXME check actual sign not the inner Text
+        if (this.firstCard.card.innerText == card.card.innerText) { // Player found 2 matching cards
+            this.points[this.player_turn] += 1;
+            console.log('Score for Player' + this.player_turn);
+
+            // TODO Block input
+            this.sleep(800)
+                .then(() => { this.hide(this.firstCard) })
+                .then(() => { this.hide(card) })
+                // TODO Unblock input
+                ;
+            if (this.checkGameOver()) this.gameOver = true;
+
+        } else { // Player didn´t found a pair
+          this.player_turn++;
+          if (this.player_turn == this.players) this.player_turn = 0;
+
+          // TODO Block input
+          this.sleep(1000)
+              .then(() => { this.flipCard(this.firstCard) })
+              .then(() => { this.flipCard(card) })
+              // TODO Unblock input
+              ;
+        }
+        this.firstTry = true;
+      }
+    }
   },
+
   checkGameOver: function () {
-    // TODO transfer from index.js
-    return false;
+    // Count the collected points
+    let collectedPoints = 0;
+    for (let i in this.points) {
+        collectedPoints += this.points[i];
+    }
+
+    // Turn points into cards and add one in case there is one trick card
+    collectedPoints *= 2;
+    if (this.totalCards % 2) collectedPoints++;
+
+    // Check if all cards are already collected
+    if (collectedPoints == this.totalCards) return true;
+    else return false;
   },
-  flipCard: function () {
-    // TODO transfer from index.js
+
+  flipCard: function (card) {
+    if (card.card.innerText == '') {
+      card.card.innerText = String.fromCodePoint(this.gameInformation[card.c][card.r]); // TODO create arr
+    }
+    else card.card.innerText = '';
   },
+
   hide: function (card) {
-    // TODO transfer from index.js
+    card.card.className += ' ' + 'hidden';
   },
+
   blockInput: function () {
     // TODO Block Input while delay is active
   },
+
   unblockInput: function () {
     // TODO Unblock Input when delay is over
   },
+
   sleep: function (ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   },
+
+  map: function (n, start1, stop1, start2, stop2) {
+    const newval = (n - start1) / (stop1 - start1) * (stop2 - start2) + start2;
+    return newval;
+  },
+
 };
