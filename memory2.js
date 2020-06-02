@@ -5,14 +5,21 @@ var Game = Game || {}; // namespace
  * @constructor
  * @param {number} [cols] Number of Columns
  * @param {number} [rows] Number of Rows
- * @param {number} [players = 2] Number of Players
+ * @param {number | string[]} [players] Number of Players or Array with Names
  * @returns {Game.Memory}
  */
 Game.Memory = function (cols, rows, players = 2) {
-  this.players = players;
+  this.players = new Array();
+  if (typeof(players) == 'number') {
+    for (let i = 0; i < players; i++) {
+      this.players[i] = ['Player' + i, 0];
+    }
+  } else if (typeof(players[0]) == 'string') {
+    for (let i = 0; i < players.length; i++) {   
+      this.players[i] = [players[i], 0];
+    }
+  }
   this.player_turn = 0;
-  this.points = new Array(players).fill(0); // ES6 requiered
-  //for (i = 0; i < this.points.length; i++) this.points[i] = 0; // Alternative
   this.cols = cols;
   this.rows = rows;
   this.totalCards = cols * rows;
@@ -123,8 +130,8 @@ Game.Memory.prototype = {
         this.flipCard(card);
         // FIXME check actual sign not the inner Text
         if (this.firstCard.card.innerText == card.card.innerText) { // Player found 2 matching cards
-            this.points[this.player_turn] += 1;
-            console.log('Score for Player' + this.player_turn);
+            this.players[this.player_turn][1] += 1;
+            console.log('Score for ' + this.players[this.player_turn][0]);
 
             // TODO Block input
             this.sleep(800)
@@ -136,7 +143,7 @@ Game.Memory.prototype = {
 
         } else { // Player didn´t found a pair
           this.player_turn++;
-          if (this.player_turn == this.players) this.player_turn = 0;
+          if (this.player_turn == this.players.length) this.player_turn = 0;
 
           // TODO Block input
           this.sleep(1000)
@@ -153,8 +160,8 @@ Game.Memory.prototype = {
   checkGameOver: function () {
     // Count the collected points
     let collectedPoints = 0;
-    for (let i in this.points) {
-        collectedPoints += this.points[i];
+    for (let i in this.players) {
+        collectedPoints += this.players[i][1];
     }
 
     // Turn points into cards and add one in case there is one trick card
@@ -183,6 +190,12 @@ Game.Memory.prototype = {
 
   unblockInput: function () {
     // TODO Unblock Input when delay is over
+  },
+
+  getScore: function () { // Temporary for debugging purposes
+    for (let i in this.players) {
+      console.log(this.players[i][0] + ' points: ' + this.players[i][1]);
+    }
   },
 
   sleep: function (ms) {
