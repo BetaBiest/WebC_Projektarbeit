@@ -5,38 +5,38 @@ var BobsGarage = BobsGarage || {}; // namespace
  * @constructor
  * @returns {BobsGarage.Car}
  */
-BobsGarage.Car = function() {
+BobsGarage.Car = function () {
+  /**
+   * Engine
+   * @constructor
+   * @returns {Engine}
+   */
+  //Definition of an engine
+  var Engine = function () {};
 
-    /**
-     * Engine
-     * @constructor
-     * @returns {Engine}
-     */
-    var Engine = function() {
-        // definition of an engine
-    };
+  Engine.prototype = {
+    constructor: Engine,
+    start: function () {
+      console.log("start engine");
+    },
+  };
 
-    Engine.prototype.constructor = Engine;
-    Engine.prototype.start = function() {
-        console.log('start engine');
-    };
+  /**
+   * Tank
+   * @constructor
+   * @returns {Tank}
+   */
+  var Tank = function () {
+    // definition of a tank
+  };
 
-    /**
-     * Tank
-     * @constructor
-     * @returns {Tank}
-     */
-    var Tank = function() {
-        // definition of a tank
-    };
+  Tank.prototype.constructor = Tank;
+  Tank.prototype.fill = function () {
+    console.log("fill tank");
+  };
 
-    Tank.prototype.constructor = Tank;
-    Tank.prototype.fill = function() {
-        console.log('fill tank');
-    };
-
-    this.engine = new Engine();
-    this.tank = new Tank();
+  this.engine = new Engine();
+  this.tank = new Tank();
 };
 
 BobsGarage.Car.prototype.constructor = BobsGarage.Car;
@@ -47,14 +47,14 @@ BobsGarage.Car.prototype.constructor = BobsGarage.Car;
  * @constructor
  * @returns {BobsGarage.Ferrari}
  */
-BobsGarage.Ferrari = function() {
-    BobsGarage.Car.call(this);
+BobsGarage.Ferrari = function () {
+  BobsGarage.Car.call(this);
 };
 //BobsGarage.Ferrari.prototype = new BobsGarage.Car();
 BobsGarage.Ferrari.prototype = Object.create(BobsGarage.Car.prototype);
 BobsGarage.Ferrari.prototype.constructor = BobsGarage.Ferrari;
-BobsGarage.Ferrari.prototype.speedUp = function() {
-    console.log('speed up');
+BobsGarage.Ferrari.prototype.speedUp = function () {
+  console.log("speed up");
 };
 
 // Test it on the road

@@ -139,9 +139,8 @@ class Game_Memory {
 }
 
 // Board must be created to set up the game
-class Board extends Game_Memory {
+class Board {
   constructor(c, r) {
-    super(c, r);
     this.rows = new Array(r);
     for (let i = 0; i < r; i++) {
       this.rows[i] = this.createRow(Number(i));
@@ -168,17 +167,17 @@ class Board extends Game_Memory {
   }
 }
 
-class Card extends Game_Memory {
+class Card {
   constructor(x, y) {
-    super();
     this.value = "";
     this.card = document.createElement("div");
 
+    // FIXME use setAttribute() instead of lines below
     let cardClass = document.createAttribute("class");
     cardClass.value = "col-" + (x + 1) + " " + "card";
     this.card.setAttributeNode(cardClass);
     cardClass = document.createAttribute("onClick");
-    cardClass.value = "Game_Memory.handleClick(this)";
+    cardClass.value = "Game_Memory.handleClick(this)"; // FIXME use () => {} writing
     this.card.setAttributeNode(cardClass);
 
     let content = document.createTextNode('');
