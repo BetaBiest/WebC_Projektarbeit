@@ -26,6 +26,7 @@ Game.Memory = function (cols, rows, players = 2) {
   this.firstTry = true;
   this.firstCard;
   this.gameOver = false;
+  this.inputBlock = false;
   this.gameInformation;
   this.gameboard = document.querySelector('#gameboard');
 
@@ -50,7 +51,7 @@ Game.Memory = function (cols, rows, players = 2) {
       this.card = document.createElement('div');
 
       this.card.setAttribute('class', 'col-' + (c + 1) + ' ' + 'card');
-      this.card.addEventListener('click', () => this.handleClick(this));
+      this.card.addEventListener('click', () => { this.handleClick(this) });
     };
 
     Card.prototype = {
@@ -82,7 +83,7 @@ Game.Memory = function (cols, rows, players = 2) {
       return newRow;
     },
 
-    handleClick: (card) => this.handleClick(card),
+    handleClick: (card) => { if(!this.inputBlock) {this.handleClick(card);} },
   };
 
   this._gameboard = new Gameboard(this.cols, this.rows, this.gameboard);
@@ -133,11 +134,11 @@ Game.Memory.prototype = {
             this.players[this.player_turn][1] += 1;
             console.log('Score for ' + this.players[this.player_turn][0]);
 
-            // TODO Block input
+            this.inputBlock = true;
             this.sleep(800)
                 .then(() => { this.hide(this.firstCard) })
                 .then(() => { this.hide(card) })
-                // TODO Unblock input
+                .then(() => this.inputBlock = false)
                 ;
             if (this.checkGameOver()) this.gameOver = true;
 
@@ -145,11 +146,11 @@ Game.Memory.prototype = {
           this.player_turn++;
           if (this.player_turn == this.players.length) this.player_turn = 0;
 
-          // TODO Block input
+          this.inputBlock = true;
           this.sleep(1000)
               .then(() => { this.flipCard(this.firstCard) })
               .then(() => { this.flipCard(card) })
-              // TODO Unblock input
+              .then(() => this.inputBlock = false)
               ;
         }
         this.firstTry = true;
