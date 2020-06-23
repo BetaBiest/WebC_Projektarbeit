@@ -21,10 +21,9 @@
 }
 
 #gameboard {
-/*     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center; */
+    display: grid;
+    grid-template-rows:     1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns:  1fr 1fr 1fr 1fr 1fr;
     
     background-color: whitesmoke;
 
@@ -76,7 +75,7 @@
     visibility: hidden;
 }
 
-@media only screen and (max-width: 600px) {
+@media only screen and () {
     body    { background-color: springgreen; }
     #game   { flex-direction: column; }
 
@@ -86,7 +85,10 @@
         padding: 10px 0;
     }
 
-    #gameboard  { width: 100%; }
+    #gameboard  {
+        width: 100%;
+        grid-template-rows: 1fr 1fr 1fr;
+    }
     
     #gameboard [class^=row] {
         width: 100%;

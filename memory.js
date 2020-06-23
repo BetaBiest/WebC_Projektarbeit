@@ -1,13 +1,5 @@
 var Game = Game || {}; // namespace
 
-Game = function () {
-
-}
-Game.prototype = {
-  constructor: Game,
-
-}
-
 /**
  * Game.Memory
  * @constructor
@@ -118,15 +110,15 @@ Game.Memory = function (cols, rows, players = 2) {
 
   // Fill Array randomly with 2 of every symbol
   for (let i = 0; i < totalSymbols * 2; i++) {
-  let buffer = symbols[i % totalSymbols];
+    let buffer = symbols[i % totalSymbols];
 
-  if (i == (totalSymbols * 2 - 1) && this.totalCards % 2) break; // Leave last symbol alone when num of cards is uneven
-  let random = Math.floor(this.map(Math.random(), 0, 1, 0, this.totalCards));
-  while (this.gameInformation[(random % this.cols)][(Math.floor(random / this.cols))] != undefined) {
-    random++;
-    if (random == this.totalCards) random = 0;
-  }
-  this.gameInformation[(random % this.cols)][(Math.floor(random / this.cols))] = buffer;
+    if (i == (totalSymbols * 2 - 1) && this.totalCards % 2) break; // Leave last symbol alone when num of cards is uneven
+    let random = Math.floor(this.map(Math.random(), 0, 1, 0, this.totalCards));
+    while (this.gameInformation[(random % this.cols)][(Math.floor(random / this.cols))] != undefined) {
+      random++;
+      if (random == this.totalCards) random = 0;
+    }
+    this.gameInformation[(random % this.cols)][(Math.floor(random / this.cols))] = buffer;
   }
 };
 
