@@ -36,7 +36,7 @@ class Card {
   }
 
   handleClick() {
-    if (!parent.inputBlock) {
+    if (!this.parent.inputBlock) {
       this.parent.handleClick(this);
     }
   }
@@ -62,10 +62,10 @@ class Memory {
 
     this.html_game = html_game;
     this.createHTMLGameConstruct(this.html_game); // Overload to show usage of this.html_game
-    this.createPlayerList(this.html_game_content_menu);
+    this.createHTMLPlayerList(this.html_content_menu);
     this.addPlayer();
-    this.createHTMLStartBlock (this.html_game_content_gameArea);
-    this.createHTMLEndBlock   (this.html_game_content_gameArea);
+    this.createHTMLStartBlock (this.html_content_gameArea);
+    this.createHTMLEndBlock   (this.html_content_gameArea);
   }
 
   createHTMLGameConstruct() {
@@ -81,16 +81,16 @@ class Memory {
     this.html_game_content.classList.add('content');
     this.html_game.appendChild(this.html_game_content);
 
-    this.html_game_content_menu = document.createElement('div');
-    this.html_game_content_menu.classList.add('menu');
-    this.html_game_content.appendChild(this.html_game_content_menu);
+    this.html_content_menu = document.createElement('div');
+    this.html_content_menu.classList.add('menu');
+    this.html_game_content.appendChild(this.html_content_menu);
 
-    this.html_game_content_gameArea = document.createElement('div');
-    this.html_game_content_gameArea.classList.add('game-area');
-    this.html_game_content.appendChild(this.html_game_content_gameArea);
+    this.html_content_gameArea = document.createElement('div');
+    this.html_content_gameArea.classList.add('game-area');
+    this.html_game_content.appendChild(this.html_content_gameArea);
   }
 
-  createPlayerList() {
+  createHTMLPlayerList() {
     this.html_menu_playerList = document.createElement('ul');
     this.html_menu_playerList.style.listStyle = 'none';
     this.html_menu_playerList.classList.add('player-list');
@@ -110,39 +110,39 @@ class Memory {
       html_li_buttons.appendChild(html_li_buttons_sub);
 
     this.html_menu_playerList.appendChild(html_li_buttons);
-    this.html_game_content_menu.appendChild(this.html_menu_playerList);
+    this.html_content_menu.appendChild(this.html_menu_playerList);
 
     // Playerlist while game is active
     this.html_menu_activePlayerList = document.createElement('ul');
     this.html_menu_activePlayerList.classList.add('player-list-active');
     this.html_menu_activePlayerList.classList.add('removed');
-    this.html_game_content_menu.appendChild(this.html_menu_activePlayerList);
+    this.html_content_menu.appendChild(this.html_menu_activePlayerList);
   }
 
   addPlayer() {
     let numOfPlayer = this.html_menu_playerList.childElementCount - 1;
     if (numOfPlayer < 4) {
-      this.playerList[numOfPlayer] = new Array(3);
+      this.playerList[numOfPlayer] = {'name': '', 'points': 0, 'lientry': null};
       
-      this.playerList[numOfPlayer][1] = 0;
+      this.playerList[numOfPlayer].points = 0;
 
       // li-items for players while game is inactive
       let html_new_liItem = document.createElement('li');
-      html_new_liItem.innerHTML =   '<input type="text" name="" id="" placeholder="Player '
+      html_new_liItem.innerHTML =   '<input type="text" placeholder="Player '
                                   + (this.playerList.length - 1) + '"'
                                   + ' maxlength="15" />';
       html_new_liItem.addEventListener('change', () => this.updatePlayerNames());
       this.html_menu_playerList.insertBefore(html_new_liItem, this.html_menu_playerList.lastElementChild);
 
       // li-items for players while game is active
-      this.playerList[numOfPlayer][2] = document.createElement('li');
-      this.playerList[numOfPlayer][2]
-      this.playerList[numOfPlayer][2].innerHTML =
+      this.playerList[numOfPlayer].lientry = document.createElement('li');
+      this.playerList[numOfPlayer].lientry
+      this.playerList[numOfPlayer].lientry.innerHTML =
           '<span class="score">'
-        +   'Player ' + (this.playerList.length - 1) + ' : ' + this.playerList[numOfPlayer][1] + ' Points'
+        +   'Player ' + (this.playerList.length - 1) + ' : ' + this.playerList[numOfPlayer].points + ' Points'
         + '</span>'
         + '<span class="collected-items"></span>';
-      this.html_menu_activePlayerList.appendChild(this.playerList[numOfPlayer][2]);
+      this.html_menu_activePlayerList.appendChild(this.playerList[numOfPlayer].lientry);
     }
     this.updatePlayerNames();
   }
@@ -155,7 +155,7 @@ class Memory {
       delete this.playerList[this.playerList.length];
     }
     else {
-      this.playerList[0][0] = 'Player 0';
+      this.playerList[0].name = 'Player 0';
       this.html_menu_playerList.firstElementChild.firstElementChild.value = '';
     }
   }
@@ -164,8 +164,8 @@ class Memory {
     let i = 0;
     let names = this.html_menu_playerList.querySelectorAll('input');
     for (let name of names) {
-      if (name.value != "") this.playerList[i][0] = name.value;
-      else this.playerList[i][0] = 'Player ' + i;
+      if (name.value != "") this.playerList[i].name = name.value;
+      else this.playerList[i].name = 'Player ' + i;
       i++;
     }
 
@@ -173,7 +173,7 @@ class Memory {
     let activeNames = this.html_menu_activePlayerList.querySelectorAll('.score');
     for (let name of activeNames) {
       name.innerText = 
-        name.innerText.replace(/([A-z]|[0-9]| )* :/i, this.playerList[i++][0] + ' : ');
+        name.innerText.replace(/[^:]* :/i, this.playerList[i++].name + ' :');
     }
   }
 
@@ -219,7 +219,7 @@ class Memory {
     html_startBlock_playButton.addEventListener('click', () => { this.startGame() });
     this.html_gameArea_startBlock.appendChild(html_startBlock_playButton);
 
-    this.html_game_content_gameArea.appendChild(this.html_gameArea_startBlock);
+    this.html_content_gameArea.appendChild(this.html_gameArea_startBlock);
   }
 
   createHTMLEndBlock() {
@@ -240,7 +240,7 @@ class Memory {
       this.html_gameArea_endBlock.appendChild(html_endBlock_button);
 
 
-    this.html_game_content_gameArea.appendChild(this.html_gameArea_endBlock);
+    this.html_content_gameArea.appendChild(this.html_gameArea_endBlock);
   }
 
   changeGameSize() {
@@ -260,9 +260,9 @@ class Memory {
 
     this.html_gameArea_startBlock.classList.add('removed');1
 
-    this.html_game_content_gameArea.classList.add('active');
+    this.html_content_gameArea.classList.add('active');
     this.activePlayer = this.randomInt(0, this.numOfPlayers);
-    this.playerList[this.activePlayer][2].classList.add('active');
+    this.playerList[this.activePlayer].lientry.classList.add('active');
 
     this.createCards();
     this.appendCards();
@@ -270,15 +270,16 @@ class Memory {
 
   endGame() {
     this.removeCards();
-    this.html_game_content_gameArea.classList.remove('active');
+    this.html_content_gameArea.classList.remove('active');
     this.html_gameArea_endBlock.querySelector('#winner').innerText = this.determineWinner('name');
     this.html_gameArea_endBlock.classList.remove('removed');
     this.html_menu_activePlayerList.querySelector('.active').classList.remove('active');
-    this.playerList[this.determineWinner('index')][2].classList.add('active');
+    this.playerList[this.determineWinner('index')].lientry.classList.add('active');
   }
   
-  resetGame() { // TODO implement
+  resetGame() {
     if (!this.gameOver) {
+      this.html_menu_activePlayerList.querySelector('.active').classList.remove('active');
       this.removeCards();
     }
     this.html_gameArea_endBlock.classList.add     ('removed');
@@ -288,11 +289,11 @@ class Memory {
     
     // Reset Points Clear activePlayerList
     for (let player of this.playerList) {
-      player[1] = 0;
-      let nameAndPoints = player[2].querySelector('.score');
+      player.points = 0;
+      let nameAndPoints = player.lientry.querySelector('.score');
       nameAndPoints.innerText = 
         nameAndPoints.innerText.replace(/: [0-9]+ [A-z]*/i, ': 0 Points');
-      let collectedItems = player[2].querySelector('.collected-items');
+      let collectedItems = player.lientry.querySelector('.collected-items');
       collectedItems.innerText = '';
     }
   }
@@ -329,15 +330,15 @@ class Memory {
 
   appendCards() {
     for(let i in this.cards) {
-      this.html_game_content_gameArea.appendChild(this.cards[i].html_card);
+      this.html_content_gameArea.appendChild(this.cards[i].html_card);
     }
   }
   
   removeCards() {
-    this.html_game_content_gameArea.innerHTML = '';
-    this.html_game_content_gameArea.classList.remove('active');
-    this.html_game_content_gameArea.appendChild(this.html_gameArea_startBlock);
-    this.html_game_content_gameArea.appendChild(this.html_gameArea_endBlock);
+    this.html_content_gameArea.innerHTML = '';
+    this.html_content_gameArea.classList.remove('active');
+    this.html_content_gameArea.appendChild(this.html_gameArea_startBlock);
+    this.html_content_gameArea.appendChild(this.html_gameArea_endBlock);
   }
 
   handleClick(card) {
@@ -352,18 +353,18 @@ class Memory {
         card.flip();
         // TODO check actual sign not the inner Text
         if (this.firstCard.value == card.value) { // Player found 2 matching cards
-          this.playerList[this.activePlayer][1] += 1;
+          this.playerList[this.activePlayer].points += 1;
           let i = 0;
           let activePlayer = this.html_menu_activePlayerList.querySelector('.active');
           let nameAndPoints = activePlayer.querySelector('.score');
           nameAndPoints.innerText = 
-            nameAndPoints.innerText.replace(/: [0-9]+ [A-z]*/i, ': ' + this.playerList[this.activePlayer][1] + (this.playerList[this.activePlayer][1] == 1 ? ' Point' : ' Points'));
+            nameAndPoints.innerText.replace(/: [0-9]+ [A-z]*/i, ': ' + this.playerList[this.activePlayer].points + (this.playerList[this.activePlayer].points == 1 ? ' Point' : ' Points'));
           let collectedItems = activePlayer.querySelector('.collected-items');
           collectedItems.innerText += String.fromCodePoint(card.value);
 
-          this.sleep(800)
-              .then(() => { this.firstCard.hide() })
-              .then(() => { card.hide() })
+          this.sleep(200)
+              .then(() => { this.firstCard.html_card.classList.add('inactive') })
+              .then(() => { card.html_card.classList.add('inactive') })
               .then(() => this.inputBlock = false)
               .then(() => {
                 if (this.checkGameOver()) {
@@ -374,10 +375,10 @@ class Memory {
           ;
 
         } else { // Player didn´t found a pair
-            this.playerList[this.activePlayer][2].classList.remove('active');
+            this.playerList[this.activePlayer].lientry.classList.remove('active');
             this.activePlayer++;
             if (this.activePlayer == this.numOfPlayers) this.activePlayer = 0;
-            this.playerList[this.activePlayer][2].classList.add('active');
+            this.playerList[this.activePlayer].lientry.classList.add('active');
 
             this.inputBlock = true;
             this.sleep(1000)
@@ -394,7 +395,7 @@ class Memory {
 
   /** @returns {boolean} Gameover T/F */
   checkGameOver() {
-    if (game.html_game_content_gameArea.querySelectorAll('.hidden').length == this.totalCards) {
+    if (game.html_content_gameArea.querySelectorAll('.hidden').length == this.totalCards) {
       return true;
     } else return false;
   }
@@ -405,13 +406,13 @@ class Memory {
   determineWinner(returnType) {
     let index = 0, max = 0;
     for (let i in this.playerList) {
-      if (this.playerList[i][1] > max) {
+      if (this.playerList[i].points > max) {
         index = Number(i);
-        max = this.playerList[i][1];
+        max = this.playerList[i].points;
       }
     }
     if (returnType === 'name') {
-      return this.playerList[index][0];      
+      return this.playerList[index].name;      
     }
     else if (returnType === 'index') {
       return index;
