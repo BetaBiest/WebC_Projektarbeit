@@ -9,22 +9,14 @@
   justify-self: center;
 }
 
+.card-outterShell.inactive { 
+  opacity: 0.4;
+  transition: opacity 1s;
+  pointer-events: none;
+}
+
 .card-outterShell:hover .card-innerShell {
   cursor: pointer;
-}
-
-.card-innerShell.turn {
-  transform: rotateY(180deg);
-}
-
-.card-innerShell {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  transition: transform 0.6s;
-  transform-style: preserve-3d;
-/*   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); */
 }
 
 .card-outterShell:hover .card-innerShell > .front,
@@ -35,8 +27,21 @@
               0 2px 10px 0 rgba(110,230,245,0.18);
 }
 
-.card-innerShell > .front,
-.card-innerShell > .back
+.card-outterShell .card-innerShell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+.card-outterShell .card-innerShell.turn {
+  transform: rotateY(180deg);
+}
+
+.card-outterShell .card-innerShell > .front,
+.card-outterShell .card-innerShell > .back
 {
   border: 2px solid transparent; /* Spaceholder so hover doesnt ruin layout */ 
   border-radius: 8px;
@@ -50,11 +55,11 @@
   backface-visibility: hidden;
 }
 
-.card-innerShell > .front {
+.card-outterShell .card-innerShell > .front {
   background-color: lightblue;
 }
 
-.card-innerShell > .back {
+.card-outterShell .card-innerShell > .back {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -64,9 +69,11 @@
   font-size: 2em;
 }
 
-[class~=card-].turn {
+.card-outterShell .card-innerShell.turn {
   transform: rotateY(180deg);
 }
+
+
 
 .game {
   font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
@@ -140,22 +147,23 @@
 }
 
 .game .content .menu .player-list-active li {
-  color: rgba(0, 0, 0, 0.6);
-
   display: flex;
   flex-direction: column;
-
+  
   margin-bottom: 20px;
   padding: 5px 0;
-
+  
   width: 100%;
-
+  
+  color: rgba(0, 0, 0, 0.4);
   box-shadow: 0 -10px 10px  -10px rgba(0,0,0,0.12),
               0 10px  10px  -10px rgba(0,0,0,0.12),
               0 -5px  5px   -5px  rgba(0,0,0,0.18),
               0 5px   5px   -5px  rgba(0,0,0,0.18);
   border-top: 1px solid transparent;
   border-bottom: 1px solid transparent;
+
+  transition: all 1s;
 }
 
 .game .content .menu .player-list-active li.active {
@@ -166,6 +174,8 @@
               0 5px    5px  -5px  rgba(110,230,245,0.6);
   border-top: 1px solid rgb(110,230,245);
   border-bottom: 1px solid rgb(110,230,245);
+
+  transition: all 1.5s;
 }
 
 .game .content .menu .player-list-active li :first-child {
