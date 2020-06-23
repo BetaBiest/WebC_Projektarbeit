@@ -395,7 +395,7 @@ class Memory {
 
   /** @returns {boolean} Gameover T/F */
   checkGameOver() {
-    if (game.html_content_gameArea.querySelectorAll('.hidden').length == this.totalCards) {
+    if (game.html_content_gameArea.querySelectorAll('.inactive').length == this.totalCards) {
       return true;
     } else return false;
   }
