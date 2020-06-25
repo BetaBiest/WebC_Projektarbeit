@@ -15,6 +15,10 @@
   pointer-events: none;
 }
 
+.card-outterShell.inactive .card-innerShell .front {
+  box-shadow: none;
+}
+
 .card-outterShell:hover .card-innerShell {
   cursor: pointer;
 }
@@ -57,6 +61,9 @@
 
 .card-outterShell .card-innerShell > .front {
   background-color: lightblue;
+  background-size: 25%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23bbb' width='18px' height='18px'%3E%3Ccircle cx='15.5' cy='9.5' r='1.5'/%3E%3Ccircle cx='8.5' cy='9.5' r='1.5'/%3E%3Cpath d='M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm0-2.5c2.33 0 4.32-1.45 5.12-3.5h-1.67c-.69 1.19-1.97 2-3.45 2s-2.75-.81-3.45-2H6.88c.8 2.05 2.79 3.5 5.12 3.5z'/%3E%3C/svg%3E");
+  /* FIXME CHANGE SMILEY */
 }
 
 .card-outterShell .card-innerShell > .back {
@@ -89,11 +96,21 @@
 
 .game .content .menu {
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
+  justify-content: space-between;
   width: 30%;
   max-width: 260px;
   padding: 10px;
 }
+
+.game .content .menu > div {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+}
+
+.game .content .menu > div > span { display: block; margin-bottom: 5px;}
 
 .game .content .menu .player-list {
   text-align: center;

@@ -44,7 +44,7 @@ class Card {
 
 class Memory {
   constructor(html_game) {
-    this.playerList = new Array(); // Array of Arrays [0="Name", 1="Points", 2="li-entry"]
+    this.playerList = new Array(); // Array of Objects {"name":String, "points":Number, "lientry":DOMObject}
     this.numOfPlayers = 0;
     this.activePlayer = 0; // whole number between 0 and numOfPlayers
     this.firstTry = true;
@@ -61,11 +61,11 @@ class Memory {
     this.cards = new Array();
 
     this.html_game = html_game;
-    this.createHTMLGameConstruct(this.html_game); // Overload to show usage of this.html_game
-    this.createHTMLPlayerList(this.html_content_menu);
-    this.addPlayer();
-    this.createHTMLStartBlock (this.html_content_gameArea);
-    this.createHTMLEndBlock   (this.html_content_gameArea);
+    this.createHTMLGameConstruct(this.html_game); // appends this.html_game
+    this.createHTMLMenu(this.html_content_menu);  // appends this.html_content_menu
+    this.addPlayer(); // First Player, not removeable
+    this.createHTMLStartBlock (this.html_content_gameArea); // appends this.html_content_gameArea
+    this.createHTMLEndBlock   (this.html_content_gameArea); // appends this.html_content_gameArea
   }
 
   createHTMLGameConstruct() {
@@ -90,7 +90,7 @@ class Memory {
     this.html_game_content.appendChild(this.html_content_gameArea);
   }
 
-  createHTMLPlayerList() {
+  createHTMLMenu() {
     this.html_menu_playerList = document.createElement('ul');
     this.html_menu_playerList.style.listStyle = 'none';
     this.html_menu_playerList.classList.add('player-list');
@@ -117,6 +117,19 @@ class Memory {
     this.html_menu_activePlayerList.classList.add('player-list-active');
     this.html_menu_activePlayerList.classList.add('removed');
     this.html_content_menu.appendChild(this.html_menu_activePlayerList);
+
+    // Resetbutton and timer
+    this.html_menu_resetField = document.createElement('div');
+    this.html_menu_resetField.innerHTML = '\
+      <span id="timer">Time 00:00</span>\
+      ';
+      let html_resetField_button = document.createElement('button');
+      html_resetField_button.setAttribute('type', 'button');
+      html_resetField_button.innerText = 'Reset';
+      html_resetField_button.addEventListener('click', () => this.resetGame());
+      this.html_menu_resetField.appendChild(html_resetField_button);
+    this.html_menu_resetField.classList.add('removed');
+    this.html_content_menu.appendChild(this.html_menu_resetField);
   }
 
   addPlayer() {
@@ -255,10 +268,12 @@ class Memory {
     this.numOfPlayers = this.playerList.length;
     this.gameactive = true;
     this.gameOver = false;
-    this.html_menu_playerList.classList.add('removed');
-    this.html_menu_activePlayerList.classList.remove('removed');
+    
+    this.html_menu_playerList.classList.add         ('removed');
+    this.html_gameArea_startBlock.classList.add     ('removed');
 
-    this.html_gameArea_startBlock.classList.add('removed');1
+    this.html_menu_activePlayerList.classList.remove('removed');
+    this.html_menu_resetField.classList.remove  	  ('removed');
 
     this.html_content_gameArea.classList.add('active');
     this.activePlayer = this.randomInt(0, this.numOfPlayers);
@@ -271,8 +286,10 @@ class Memory {
   endGame() {
     this.removeCards();
     this.html_content_gameArea.classList.remove('active');
+
     this.html_gameArea_endBlock.querySelector('#winner').innerText = this.determineWinner('name');
     this.html_gameArea_endBlock.classList.remove('removed');
+    
     this.html_menu_activePlayerList.querySelector('.active').classList.remove('active');
     this.playerList[this.determineWinner('index')].lientry.classList.add('active');
   }
@@ -284,6 +301,7 @@ class Memory {
     }
     this.html_gameArea_endBlock.classList.add     ('removed');
     this.html_menu_activePlayerList.classList.add ('removed');
+    this.html_menu_resetField.classList.add       ('removed');
     this.html_menu_playerList.classList.remove    ('removed');
     this.html_gameArea_startBlock.classList.remove('removed');
     
