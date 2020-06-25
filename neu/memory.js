@@ -244,7 +244,7 @@ class Memory {
 
     this.html_gameArea_endBlock.innerHTML = '\
       <span>🥳 Winner 🥳</span>\
-      <span id="winner">Player 3</span>\
+      <span id="winner"></span>\
       ';
 
       let html_endBlock_button = document.createElement('button');
@@ -253,7 +253,6 @@ class Memory {
       html_endBlock_button.innerText = 'New Game';
 
       this.html_gameArea_endBlock.appendChild(html_endBlock_button);
-
 
     this.html_content_gameArea.appendChild(this.html_gameArea_endBlock);
   }
@@ -281,6 +280,12 @@ class Memory {
     const cols = Math.ceil(Math.sqrt(this.totalCards));
     this.html_content_gameArea.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
 
+    // removes active class from each player that currently possesses it (in case winners from prev game are hightlighted)
+    let activePlayers = this.html_menu_activePlayerList.querySelectorAll('.active');
+    for (let player of activePlayers) {
+      player.classList.remove('active');
+    }
+    // random Player gets selected to start
     this.activePlayer = this.randomInt(0, this.numOfPlayers);
     this.playerList[this.activePlayer].lientry.classList.add('active');
 
@@ -295,11 +300,23 @@ class Memory {
     this.removeCards();
     this.html_content_gameArea.classList.remove('active');
 
-    this.html_gameArea_endBlock.querySelector('#winner').innerText = this.determineWinner('name');
+    let html_winners = this.html_gameArea_endBlock.querySelector('#winner');
+    html_winners.innerHTML = '';
+
+    // removes active class from each player that currently possesses it
+    let activePlayers = this.html_menu_activePlayerList.querySelectorAll('.active');
+    for (let player of activePlayers) {
+      player.classList.remove('active');
+    }
+
+    // winners names get written in the dialog and they are highlighted
+    let winners_index = this.determineWinner();
+    for (let i in winners_index) {
+      html_winners.innerHTML += `${this.playerList[winners_index[i]].name}</br>`;
+      this.playerList[winners_index[i]].lientry.classList.add('active');
+    }
+
     this.html_gameArea_endBlock.classList.remove('removed');
-    
-    this.html_menu_activePlayerList.querySelector('.active').classList.remove('active');
-    this.playerList[this.determineWinner('index')].lientry.classList.add('active');
   }
   
   resetGame() {
@@ -452,23 +469,22 @@ class Memory {
     } else return false;
   }
 
-  /**
-   * @param {String} [returnType] ('name' | 'index')
-   * @returns {String | Number} Playername | Index for Playerlist */
-  determineWinner(returnType) {
-    let index = 0, max = 0;
+  /** @returns {Array} Array of Indices for playerList */
+  determineWinner() {
+    let max = 0;
     for (let i in this.playerList) {
       if (this.playerList[i].points > max) {
-        index = Number(i);
         max = this.playerList[i].points;
       }
     }
-    if (returnType === 'name') {
-      return this.playerList[index].name;      
+    let winners = new Array();
+    let index = 0;
+    for (let i in this.playerList) {
+      if (this.playerList[i].points == max){
+        winners[index++] = Number(i);
+      }
     }
-    else if (returnType === 'index') {
-      return index;
-    }
+    return winners;
   }
 
   /**
