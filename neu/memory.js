@@ -60,6 +60,9 @@ class Memory {
     this.gameboard;
     this.cards = new Array();
 
+    this.passedTime = 0;
+    this.timerInterval;
+
     this.html_game = html_game;
     this.createHTMLGameConstruct(this.html_game); // appends this.html_game
     this.createHTMLMenu(this.html_content_menu);  // appends this.html_content_menu
@@ -120,12 +123,13 @@ class Memory {
 
     // Resetbutton and timer
     this.html_menu_resetField = document.createElement('div');
-    this.html_menu_resetField.innerHTML = '\
-      <span id="timer">Time 00:00</span>\
-      ';
+      this.html_resetField_timer = document.createElement('span');
+      this.html_resetField_timer.innerText = 'Time 00:00';
+      this.html_menu_resetField.appendChild(this.html_resetField_timer);
+
       let html_resetField_button = document.createElement('button');
       html_resetField_button.setAttribute('type', 'button');
-      html_resetField_button.innerText = 'Reset';
+      html_resetField_button.innerText = 'Reset Game';
       html_resetField_button.addEventListener('click', () => this.resetGame());
       this.html_menu_resetField.appendChild(html_resetField_button);
     this.html_menu_resetField.classList.add('removed');
@@ -135,15 +139,14 @@ class Memory {
   addPlayer() {
     let numOfPlayer = this.html_menu_playerList.childElementCount - 1;
     if (numOfPlayer < 4) {
-      this.playerList[numOfPlayer] = {'name': '', 'points': 0, 'lientry': null};
-      
-      this.playerList[numOfPlayer].points = 0;
+      this.playerList[numOfPlayer] = {'name': 'Player ' + (this.playerList.length), 'points': 0, 'trys': 0, 'lientry': null};
+
 
       // li-items for players while game is inactive
       let html_new_liItem = document.createElement('li');
-      html_new_liItem.innerHTML =   '<input type="text" placeholder="Player '
-                                  + (this.playerList.length - 1) + '"'
-                                  + ' maxlength="15" />';
+      html_new_liItem.innerHTML = 
+        `<input type="text" placeholder="Player ${this.playerList.length - 1}" maxlength="15" />`
+
       html_new_liItem.addEventListener('change', () => this.updatePlayerNames());
       this.html_menu_playerList.insertBefore(html_new_liItem, this.html_menu_playerList.lastElementChild);
 
@@ -152,12 +155,11 @@ class Memory {
       this.playerList[numOfPlayer].lientry
       this.playerList[numOfPlayer].lientry.innerHTML =
           '<span class="score">'
-        +   'Player ' + (this.playerList.length - 1) + ' : ' + this.playerList[numOfPlayer].points + ' Points'
+        +   `${this.playerList[numOfPlayer].name} : ${this.playerList[numOfPlayer].points} Points : ${this.playerList[numOfPlayer].trys} Trys`
         + '</span>'
         + '<span class="collected-items"></span>';
       this.html_menu_activePlayerList.appendChild(this.playerList[numOfPlayer].lientry);
     }
-    this.updatePlayerNames();
   }
 
   remPlayer() {
@@ -168,8 +170,8 @@ class Memory {
       delete this.playerList[this.playerList.length];
     }
     else {
-      this.playerList[0].name = 'Player 0';
       this.html_menu_playerList.firstElementChild.firstElementChild.value = '';
+      this.updatePlayerNames();
     }
   }
 
@@ -178,7 +180,7 @@ class Memory {
     let names = this.html_menu_playerList.querySelectorAll('input');
     for (let name of names) {
       if (name.value != "") this.playerList[i].name = name.value;
-      else this.playerList[i].name = 'Player ' + i;
+      else this.playerList[i].name = `Player ${i}`;
       i++;
     }
 
@@ -186,7 +188,7 @@ class Memory {
     let activeNames = this.html_menu_activePlayerList.querySelectorAll('.score');
     for (let name of activeNames) {
       name.innerText = 
-        name.innerText.replace(/[^:]* :/i, this.playerList[i++].name + ' :');
+        name.innerText.replace(/[^:]* :/i, `${this.playerList[i++].name} :`);
     }
   }
 
@@ -276,14 +278,20 @@ class Memory {
     this.html_menu_resetField.classList.remove  	  ('removed');
 
     this.html_content_gameArea.classList.add('active');
+    const cols = Math.ceil(Math.sqrt(this.totalCards));
+    this.html_content_gameArea.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
     this.activePlayer = this.randomInt(0, this.numOfPlayers);
     this.playerList[this.activePlayer].lientry.classList.add('active');
 
     this.createCards();
     this.appendCards();
+
+    this.timerInterval = setInterval(() => { this.timer() }, 1000);
   }
 
   endGame() {
+    clearInterval(this.timerInterval); // stops timer
     this.removeCards();
     this.html_content_gameArea.classList.remove('active');
 
@@ -296,6 +304,7 @@ class Memory {
   
   resetGame() {
     if (!this.gameOver) {
+      clearInterval(this.timerInterval); // stops timer
       this.html_menu_activePlayerList.querySelector('.active').classList.remove('active');
       this.removeCards();
     }
@@ -308,12 +317,17 @@ class Memory {
     // Reset Points Clear activePlayerList
     for (let player of this.playerList) {
       player.points = 0;
+      player.trys = 0;
       let nameAndPoints = player.lientry.querySelector('.score');
-      nameAndPoints.innerText = 
-        nameAndPoints.innerText.replace(/: [0-9]+ [A-z]*/i, ': 0 Points');
+      nameAndPoints.innerText = `${player.name} : ${player.points} Points : ${player.trys} Trys`;
       let collectedItems = player.lientry.querySelector('.collected-items');
       collectedItems.innerText = '';
     }
+
+    // Reset Timer
+    this.passedTime = 0;
+    this.html_resetField_timer.innerText = 
+      this.html_resetField_timer.innerText.replace(/[0-9]{2}:[0-9]{2}/i, '00:00');
   }
 
   createCards() {
@@ -328,11 +342,11 @@ class Memory {
       symbols[i] = 0x1F600 + i;
     }
   
-    // Fill Array randomly with 2 of each symbol
+    // fill Array randomly with 2 of each symbol
     for (let i = 0; i < totalSymbols * 2; i++) {
       let buffer = symbols[i % totalSymbols];
     
-      if (i == (totalSymbols * 2 - 1) && this.totalCards % 2) break; // Leave last symbol alone when num of cards is uneven
+      if (i == (totalSymbols * 2 - 1) && this.totalCards % 2) break; // leave last symbol alone when num of cards is uneven
       let random = Math.floor(this.map(Math.random(), 0, 1, 0, this.totalCards));
       while (this.gameboard[random] != undefined) {
         random++;
@@ -352,11 +366,15 @@ class Memory {
     }
   }
   
+  // clears the gameArea and the array that contains the cards
   removeCards() {
     this.html_content_gameArea.innerHTML = '';
     this.html_content_gameArea.classList.remove('active');
     this.html_content_gameArea.appendChild(this.html_gameArea_startBlock);
     this.html_content_gameArea.appendChild(this.html_gameArea_endBlock);
+
+    delete this.cards;
+    this.cards = new Array();
   }
 
   handleClick(card) {
@@ -367,17 +385,23 @@ class Memory {
     }
     else {
       if (!(this.firstCard == card)) {
-        this.inputBlock = true;
+        this.inputBlock = true; // critical section because two cards are already selected
         card.flip();
-        // TODO check actual sign not the inner Text
-        if (this.firstCard.value == card.value) { // Player found 2 matching cards
+
+        let activePlayerLiEntry = this.html_menu_activePlayerList.querySelector('.active');
+        let nameAndPoints = activePlayerLiEntry.querySelector('.score');
+
+        // counting up the number of trys
+        nameAndPoints.innerText =
+          nameAndPoints.innerText.replace(/: [0-9]+ (Trys|Try)/i,
+            `: ${++this.playerList[this.activePlayer].trys} ${this.playerList[this.activePlayer].trys != 1 ? ' Trys' : ' Try'}`
+            );
+
+        if (this.firstCard.value == card.value) { // player found 2 matching cards
           this.playerList[this.activePlayer].points += 1;
-          let i = 0;
-          let activePlayer = this.html_menu_activePlayerList.querySelector('.active');
-          let nameAndPoints = activePlayer.querySelector('.score');
           nameAndPoints.innerText = 
-            nameAndPoints.innerText.replace(/: [0-9]+ [A-z]*/i, ': ' + this.playerList[this.activePlayer].points + (this.playerList[this.activePlayer].points == 1 ? ' Point' : ' Points'));
-          let collectedItems = activePlayer.querySelector('.collected-items');
+            nameAndPoints.innerText.replace(/: [0-9]+ Point[s]{0,1}/i, ': ' + this.playerList[this.activePlayer].points + (this.playerList[this.activePlayer].points == 1 ? ' Point' : ' Points'));
+          let collectedItems = activePlayerLiEntry.querySelector('.collected-items');
           collectedItems.innerText += String.fromCodePoint(card.value);
 
           this.sleep(200)
@@ -392,7 +416,7 @@ class Memory {
               })
           ;
 
-        } else { // Player didn´t found a pair
+        } else { // player didn´t found a pair
             this.playerList[this.activePlayer].lientry.classList.remove('active');
             this.activePlayer++;
             if (this.activePlayer == this.numOfPlayers) this.activePlayer = 0;
@@ -409,6 +433,16 @@ class Memory {
         this.firstTry = true;
       }
     }
+  }
+
+  timer() {
+    let minutes = Math.floor(this.passedTime / 60) % 60;
+    if (minutes < 10) minutes = '0' + minutes;
+    let secounds = this.passedTime % 60;
+    if (secounds < 10) secounds = '0' + secounds;
+    this.html_resetField_timer.innerText = 
+      this.html_resetField_timer.innerText.replace(/[0-9]{2}:[0-9]{2}/i, `${minutes}:${secounds}`);
+    this.passedTime += 1;
   }
 
   /** @returns {boolean} Gameover T/F */

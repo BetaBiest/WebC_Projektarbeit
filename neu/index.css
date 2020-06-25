@@ -23,10 +23,13 @@
   cursor: pointer;
 }
 
+.card-outterShell:hover .card-innerShell > .front {
+  border: 10px double rgb(107, 201, 235);
+}
+
 .card-outterShell:hover .card-innerShell > .front,
 .card-outterShell:hover .card-innerShell > .back
 {
-  border: 2px solid lightblue;
   box-shadow: 0 2px 5px 0 rgba(110,230,245,0.60),
               0 2px 10px 0 rgba(110,230,245,0.18);
 }
@@ -44,6 +47,7 @@
   transform: rotateY(180deg);
 }
 
+/* .back is the default hidden face and contains the smileys */
 .card-outterShell .card-innerShell > .front,
 .card-outterShell .card-innerShell > .back
 {
@@ -61,9 +65,10 @@
 
 .card-outterShell .card-innerShell > .front {
   background-color: lightblue;
-  background-size: 25%;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23bbb' width='18px' height='18px'%3E%3Ccircle cx='15.5' cy='9.5' r='1.5'/%3E%3Ccircle cx='8.5' cy='9.5' r='1.5'/%3E%3Cpath d='M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm0-2.5c2.33 0 4.32-1.45 5.12-3.5h-1.67c-.69 1.19-1.97 2-3.45 2s-2.75-.81-3.45-2H6.88c.8 2.05 2.79 3.5 5.12 3.5z'/%3E%3C/svg%3E");
-  /* FIXME CHANGE SMILEY */
+  background-size: 33.33%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath d='M9 11.75c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25-.56-1.25-1.25-1.25zm6 0c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25-.56-1.25-1.25-1.25zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-.29.02-.58.05-.86 2.36-1.05 4.23-2.98 5.21-5.37C11.07 8.33 14.05 10 17.42 10c.78 0 1.53-.09 2.25-.26.21.71.33 1.47.33 2.26 0 4.41-3.59 8-8 8z' fill='%23faf9f9'/%3E%3C/svg%3E");
+  
+  border: 8px double white;
 }
 
 .card-outterShell .card-innerShell > .back {
@@ -72,6 +77,9 @@
   align-items: center;
   background-color: lightgreen;
   transform: rotateY(180deg);
+
+  background-image: url("resources/pattern.svg");
+  background-blend-mode: overlay;
 
   font-size: 2em;
 }
@@ -227,7 +235,6 @@
 
 .game .content .game-area.active {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
   grid-gap: 10px;
   flex-grow: inherit;
 }
