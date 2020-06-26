@@ -23,7 +23,7 @@ class Card {
 
   flip() {
     if (this.html_cardInner.classList.contains('turn')) {
-      this.html_cardInner.classList.remove('turn'); // TODO Check correctness
+      this.html_cardInner.classList.remove('turn');
     }
     else this.html_cardInner.classList.add('turn');
   }
@@ -103,13 +103,11 @@ class Memory {
       let html_li_buttons_add = document.createElement('button');
       html_li_buttons_add.addEventListener('click', () => this.addPlayer());
       html_li_buttons_add.classList.add('li-buttons-plus');
-      html_li_buttons_add.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>';
       html_li_buttons.appendChild(html_li_buttons_add);
 
       let html_li_buttons_sub = document.createElement('button');
       html_li_buttons_sub.addEventListener('click', () => this.remPlayer());
       html_li_buttons_sub.classList.add('li-buttons-sub');
-      html_li_buttons_sub.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 13H5v-2h14v2z"/></svg>';
       html_li_buttons.appendChild(html_li_buttons_sub);
 
     this.html_menu_playerList.appendChild(html_li_buttons);
@@ -128,6 +126,7 @@ class Memory {
       this.html_menu_resetField.appendChild(this.html_resetField_timer);
 
       let html_resetField_button = document.createElement('button');
+      html_resetField_button.classList.add('buttons');
       html_resetField_button.setAttribute('type', 'button');
       html_resetField_button.innerText = 'Reset Game';
       html_resetField_button.addEventListener('click', () => this.resetGame());
@@ -229,6 +228,7 @@ class Memory {
     this.html_gameArea_startBlock.appendChild(html_startBlock_sizeSetting);
 
     let html_startBlock_playButton = document.createElement('button');
+    html_startBlock_playButton.classList.add('buttons');
     html_startBlock_playButton.setAttribute('type', 'button');
     html_startBlock_playButton.innerText = 'PLAY';
     html_startBlock_playButton.addEventListener('click', () => { this.startGame() });
@@ -248,6 +248,7 @@ class Memory {
       ';
 
       let html_endBlock_button = document.createElement('button');
+      html_endBlock_button.classList.add('buttons')
       html_endBlock_button.addEventListener('click', () => console.log(this.resetGame()));
       html_endBlock_button.setAttribute('type', 'button');
       html_endBlock_button.innerText = 'New Game';
@@ -279,6 +280,7 @@ class Memory {
     this.html_content_gameArea.classList.add('active');
     const cols = Math.ceil(Math.sqrt(this.totalCards));
     this.html_content_gameArea.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    this.html_content_gameArea.style.fontSize = `${Math.floor(35/cols)}vmin`;
 
     // removes active class from each player that currently possesses it (in case winners from prev game are hightlighted)
     let activePlayers = this.html_menu_activePlayerList.querySelectorAll('.active');
@@ -296,6 +298,9 @@ class Memory {
   }
 
   endGame() {
+    // reset the font-size to default value
+    this.html_content_gameArea.style.fontSize = '';
+
     clearInterval(this.timerInterval); // stops timer
     this.removeCards();
     this.html_content_gameArea.classList.remove('active');
@@ -321,6 +326,8 @@ class Memory {
   
   resetGame() {
     if (!this.gameOver) {
+      // reset the font-size to default value
+      this.html_content_gameArea.style.fontSize = '';
       clearInterval(this.timerInterval); // stops timer
       this.html_menu_activePlayerList.querySelector('.active').classList.remove('active');
       this.removeCards();
@@ -345,6 +352,9 @@ class Memory {
     this.passedTime = 0;
     this.html_resetField_timer.innerText = 
       this.html_resetField_timer.innerText.replace(/[0-9]{2}:[0-9]{2}/i, '00:00');
+
+    // Reset gamestatus
+    this.firstTry = true;
   }
 
   createCards() {

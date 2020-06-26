@@ -2,12 +2,14 @@
 
 .card-outterShell {
   background-color: transparent;
-  width: 80px;
-  height: 80px;
-  perspective: 1000px; /* Adjust for different Cardsize */
+  width: 100%;
+  height: 100%;
+  perspective: 800px; /* Adjust for different Cardsize */
   align-self: center;
   justify-self: center;
 }
+
+.card-outterShell .card-innerShell { padding-bottom: 100%; }
 
 .card-outterShell.inactive { 
   opacity: 0.4;
@@ -80,8 +82,6 @@
 
   background-image: url("resources/pattern.svg");
   background-blend-mode: overlay;
-
-  font-size: 2em;
 }
 
 .card-outterShell .card-innerShell.turn {
@@ -89,6 +89,21 @@
 }
 
 
+
+button.buttons {
+  color: #fff;
+  background-color: rgb(0, 120, 212);
+  border: none;
+  outline: none;
+
+  padding: 5px 8px;
+}
+
+button.buttons:hover {
+  cursor: pointer;
+  color: #eee;
+  background-color: rgb(1, 103, 180);
+}
 
 .game {
   font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
@@ -137,7 +152,10 @@
 }
 
 .game .content .menu .player-list li:last-child {
-  margin-top: 5px;
+  display: flex;
+  margin-top: 0.8em;
+  align-items: flex-start;
+  justify-content: center;
 }
 
 .game .content .menu .player-list li > input {
@@ -146,19 +164,52 @@
 }
 
 /*****************************Button styling*********************************/
-.game .content .menu .player-list button {
-  transform: scale(0.6);
+button[class^=li-buttons] {
+  height: 2em;
+  width: 2em;
+
+  margin: 0 5px;
+  outline: none;
+  border-radius: 50%;
+  background-size: 100%;
+  
+  transition: all 0.25s;
 }
 
-.game .content .menu .player-list button:hover,
-.game .content .menu .player-list button:focus
-{
+button[class^=li-buttons]:focus {
+  border: 1px solid black;
 }
 
-.game .content .menu .player-list button:active {
+button[class^=li-buttons]:hover {
+  cursor: pointer;
+
+  height: 2.2em;
+  width: 2.2em;
+
+  transition: all 0.5s;
 }
 
-.game .content .menu .player-list button:focus {
+button.li-buttons-plus {
+  background-color: #6cdd9d;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath d='M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z'/%3E%3C/svg%3E");;
+  
+  border: 1px solid #004b1c;
+}
+
+button.li-buttons-plus:hover {
+  background-color: #17d469;
+}
+
+button.li-buttons-sub {
+  background-color: #FF6E69;
+  background-size: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 0 24 24' width='24'%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3Cpath d='M19 13H5v-2h14v2z'/%3E%3C/svg%3E");
+
+  border: 1px solid #a4373a;
+}
+
+button.li-buttons-sub:hover {
+  background-color: #ff423b;
 }
 /****************************************************************************/
 
@@ -235,8 +286,9 @@
 
 .game .content .game-area.active {
   display: grid;
-  grid-gap: 10px;
-  flex-grow: inherit;
+  grid-gap: 20px;
+
+  padding: 10px;
 }
 
 
@@ -265,9 +317,5 @@
 
   .game .content .menu .player-list-active {
     width: 100%;
-  }
-
-  .game .content .game-area.active {
-    grid-template-columns: repeat(4, 1fr);
   }
 }
