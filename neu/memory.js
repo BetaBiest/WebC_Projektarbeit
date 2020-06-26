@@ -8,7 +8,6 @@ class Card {
 
     this.html_cardInner = document.createElement('div');
     this.html_cardInner.classList.add('card-innerShell');
-/*     this.html_cardInner.addEventListener('transitionend', () => { this.handleClick() }); */
     this.html_card.appendChild(this.html_cardInner);
 
     let html_cardInner_front = document.createElement('div');
