@@ -217,7 +217,7 @@ button.li-buttons-sub:hover {
 .game .content .menu .player-list-active {
   list-style: none;
 
-  margin: 0;
+  margin: 16px 0;
   padding: 0;
   max-width: 100%;
   width: 100%;
@@ -227,7 +227,7 @@ button.li-buttons-sub:hover {
   display: flex;
   flex-direction: column;
   
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   padding: 5px 0;
   
   width: 100%;
