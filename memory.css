@@ -319,4 +319,9 @@ button.li-buttons-sub:hover {
   .game .content .menu .player-list-active {
     width: 100%;
   }
+
+  .game .content .game-area.active {
+    padding: 10px 0;
+    width: 100vw;
+  }
 }
